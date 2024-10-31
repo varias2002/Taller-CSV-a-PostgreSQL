@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Departamentos</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Añade Bootstrap para estilos mejorados -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <nav>
+        <ul class="nav">
+            <li class="nav-item"><a class="nav-link" href="/indexdepartments.html">Lista de Departamentos</a></li>
+            <li class="nav-item"><a class="nav-link" href="/insertardepartments.html">Insertar Departamento</a></li>
+            <li class="nav-item"><a class="nav-link" href="/deletedepartments.html">Eliminar Departamento</a></li>
+            <li class="nav-item"><a class="nav-link" href="/updatedepartments.html">Actualizar Departamento</a></li>
+        </ul>
+    </nav>
+    <div class="container mt-4">
+        <h2>Lista de Departamentos</h2>
+        <!-- Barra de búsqueda -->
+        <div class="form-group">
+            <input type="text" id="searchBar" class="form-control" placeholder="Buscar por ID">
+        </div>
+        <table id="departmentsTable" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Manager ID</th>
+                    <th>Location ID</th> <!-- Nuevo campo agregado -->
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Los datos de los departamentos serán insertados aquí -->
+            </tbody>
+        </table>
+    </div>
+    <script>
+        async function fetchDepartments() {
+            try {
+                const response = await fetch('/departments');
+                const departments = await response.json();
+                const tableBody = document.querySelector('#departmentsTable tbody');
+                tableBody.innerHTML = ''; // Limpiar el contenido previo
+                departments.forEach(department => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${department.department_id}</td>
+                        <td>${department.department_name}</td>
+                        <td>${department.manager_id}</td>
+                        <td>${department.location_id}</td> <!-- Mostrar el Location ID -->
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error fetching departments:', error);
+            }
+        }
+        function filterTable() {
+            const searchInput = document.querySelector('#searchBar').value.toLowerCase();
+            const rows = document.querySelectorAll('#departmentsTable tbody tr');
+            rows.forEach(row => {
+                const id = row.cells[0].textContent.toLowerCase();
+                if (id.includes(searchInput)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+        document.querySelector('#searchBar').addEventListener('input', filterTable);
+        window.onload = fetchDepartments;
+    </script>
+</body>
+</html>

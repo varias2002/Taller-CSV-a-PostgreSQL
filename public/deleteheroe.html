@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eliminar Héroe</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 50px;
+        }
+        .container {
+            max-width: 600px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center">Eliminar Héroe</h2>
+        <form id="deleteHeroForm">
+            <div class="form-group">
+                <label for="id">ID del Héroe:</label>
+                <input type="number" class="form-control" id="id" name="id" required>
+            </div>
+            <button type="submit" class="btn btn-danger btn-block">Eliminar Héroe</button>
+        </form>
+        <div id="deleteResponse" class="mt-3"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.getElementById('deleteHeroForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const id = document.getElementById('id').value;
+
+            try {
+                const response = await fetch(`/heroe/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error al eliminar el héroe');
+                }
+
+                const result = await response.json();
+                document.getElementById('deleteResponse').innerHTML = `<div class="alert alert-success">Resultado: ${result.message}</div>`;
+                window.location.href = '/indexheroe.html'; // Redirige a la página principal después de eliminar
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('deleteResponse').innerHTML = `<div class="alert alert-danger">Error al eliminar el héroe.</div>`;
+            }
+        });
+    </script>
+</body>
+</html>

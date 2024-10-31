@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Actores</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Añade Bootstrap para estilos mejorados -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+
+<body>
+    <nav>
+        <ul class="nav">
+            <li class="nav-item"><a class="nav-link" href="/index.html">Lista de Actores</a></li>
+            <li class="nav-item"><a class="nav-link" href="/insertar.html">Insertar Actor</a></li>
+            <li class="nav-item"><a class="nav-link" href="/delete.html">Eliminar Actor</a></li>
+            <li class="nav-item"><a class="nav-link" href="/update.html">Actualizar Actor</a></li>
+        </ul>
+    </nav>
+
+    <div class="container mt-4">
+        <h2>Lista de Actores</h2>
+        <!-- Barra de búsqueda -->
+        <div class="form-group">
+            <input type="text" id="searchBar" class="form-control" placeholder="Buscar por ID">
+        </div>
+        <table id="actorsTable" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Nombre Real</th>
+                    <th>Fecha de Nacimiento</th>
+                    <th>Fecha de Muerte</th>
+                    <th>Nacionalidad</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Los datos de los actores serán insertados aquí -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        async function fetchActors() {
+            try {
+                const response = await fetch('/actores');
+                const actors = await response.json();
+
+                // Ordenar los actores por ID
+                actors.sort((a, b) => a.cod_act.localeCompare(b.cod_act, undefined, { numeric: true, sensitivity: 'base' }));
+
+                const tableBody = document.querySelector('#actorsTable tbody');
+                tableBody.innerHTML = ''; // Limpiar el contenido previo
+
+                actors.forEach(actor => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${actor.cod_act}</td>
+                        <td>${actor.nom_act}</td>
+                        <td>${actor.nom_rea_act}</td>
+                        <td>${actor.fec_nac_act ? new Date(actor.fec_nac_act).toLocaleDateString() : 'N/A'}</td>
+                        <td>${actor.fec_mue_act ? new Date(actor.fec_mue_act).toLocaleDateString() : 'N/A'}</td>
+                        <td>${actor.naciona_act}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error fetching actors:', error);
+            }
+        }
+
+        function filterTable() {
+            const searchInput = document.querySelector('#searchBar').value.toLowerCase();
+            const rows = document.querySelectorAll('#actorsTable tbody tr');
+            rows.forEach(row => {
+                const id = row.cells[0].textContent.toLowerCase();
+                if (id.includes(searchInput)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        document.querySelector('#searchBar').addEventListener('input', filterTable);
+
+        window.onload = fetchActors;
+    </script>
+</body>
+
+</html>

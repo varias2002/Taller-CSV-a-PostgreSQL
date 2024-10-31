@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Héroes</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding-top: 50px;
+        }
+        .container {
+            max-width: 800px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul class="nav">
+            <li class="nav-item"><a class="nav-link" href="/indexheroe.html">Lista de Héroes</a></li>
+            <li class="nav-item"><a class="nav-link" href="/insertarheroe.html">Insertar Héroe</a></li>
+            <li class="nav-item"><a class="nav-link" href="/deleteheroe.html">Eliminar Héroe</a></li>
+            <li class="nav-item"><a class="nav-link" href="/updateheroe.html">Actualizar Héroe</a></li>
+        </ul>
+    </nav>
+
+    <div class="container mt-4">
+        <h2>Lista de Héroes</h2>
+        <div class="form-group">
+            <input type="text" id="searchBar" class="form-control" placeholder="Buscar por ID">
+        </div>
+        <table id="heroesTable" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Biografía</th>
+                    <th>Imagen</th>
+                    <th>Aparición</th>
+                    <th>Casa</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Los datos de los héroes serán insertados aquí -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        async function fetchHeroes() {
+            try {
+                const response = await fetch('/heroes');
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta de la API');
+                }
+                const heroes = await response.json();
+
+                // Verifica que los héroes tienen el campo 'id'
+                heroes.forEach(hero => {
+                    if (hero.id === undefined || hero.id === null) {
+                        console.warn('Héroe sin ID:', hero);
+                    }
+                });
+
+                // Ordenar los héroes por ID numéricamente
+                heroes.sort((a, b) => a.id - b.id);
+
+                const tableBody = document.querySelector('#heroesTable tbody');
+                tableBody.innerHTML = ''; // Limpiar el contenido previo
+
+                heroes.forEach(hero => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${hero.id || 'ID no disponible'}</td>
+                        <td>${hero.nombre || 'Nombre no disponible'}</td>
+                        <td>${hero.bio || 'Biografía no disponible'}</td>
+                        <td><img src="${hero.img ? hero.img : 'img/imagen_no_disponible.jpg'}" alt="${hero.nombre || 'Nombre no disponible'}" style="max-width: 100px;"></td>
+                        <td>${hero.aparicion ? new Date(hero.aparicion).toLocaleDateString() : 'Fecha no disponible'}</td>
+                        <td>${hero.casa || 'Casa no disponible'}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error fetching heroes:', error);
+            }
+        }
+
+        function filterTable() {
+            const searchInput = document.querySelector('#searchBar').value.toLowerCase();
+            const rows = document.querySelectorAll('#heroesTable tbody tr');
+            rows.forEach(row => {
+                const id = row.cells[0].textContent.toLowerCase();
+                if (id.includes(searchInput)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        document.querySelector('#searchBar').addEventListener('input', filterTable);
+
+        window.onload = fetchHeroes;
+    </script>
+</body>
+</html>

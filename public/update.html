@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualizar Actor</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 50px;
+        }
+        .container {
+            max-width: 600px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center">Actualizar Actor</h2>
+        <form id="updateActorForm">
+            <div class="form-group">
+                <label for="id">ID del Actor:</label>
+                <input type="text" class="form-control" id="id" name="id" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="nom_act">Nombre del Actor:</label>
+                <input type="text" class="form-control" id="nom_act" name="nom_act">
+            </div>
+            
+            <div class="form-group">
+                <label for="nom_rea_act">Nombre Real del Actor:</label>
+                <input type="text" class="form-control" id="nom_rea_act" name="nom_rea_act">
+            </div>
+            
+            <div class="form-group">
+                <label for="fec_nac_act">Fecha de Nacimiento:</label>
+                <input type="date" class="form-control" id="fec_nac_act" name="fec_nac_act">
+            </div>
+            
+            <div class="form-group">
+                <label for="fec_mue_act">Fecha de Muerte:</label>
+                <input type="date" class="form-control" id="fec_mue_act" name="fec_mue_act">
+            </div>
+            
+            <div class="form-group">
+                <label for="naciona_act">Nacionalidad:</label>
+                <input type="text" class="form-control" id="naciona_act" name="naciona_act">
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">Actualizar Actor</button>
+        </form>
+
+        <div id="updateResponse" class="mt-3"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.getElementById('updateActorForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            const id = data.id;
+            delete data.id; // Elimina el ID del objeto de datos
+
+            // Elimina campos vacíos
+            Object.keys(data).forEach(key => {
+                if (!data[key]) {
+                    delete data[key];
+                }
+            });
+
+            try {
+                const response = await fetch(`/actor/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error al actualizar el actor');
+                }
+
+                const result = await response.json();
+                document.getElementById('updateResponse').innerHTML = `<div class="alert alert-success">Actor actualizado: ${JSON.stringify(result)}</div>`;
+                window.location.href = '/index.html'; // Redirige a la página principal después de actualizar
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('updateResponse').innerHTML = `<div class="alert alert-danger">Error al actualizar el actor.</div>`;
+            }
+        });
+    </script>
+</body>
+</html>
